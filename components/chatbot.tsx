@@ -2,11 +2,27 @@
 import AIMessage from "@/ui/ai-message";
 import ChatInput from "@/ui/chat-input";
 import UserMessage from "@/ui/user-message";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { TbMessageChatbot } from "react-icons/tb";
+
+type Message = {
+    text: string;
+    sender: string
+}
 
 export default function Chatbot() {
   const [showChat, setShowChat] = useState(false);
+  const [userMessage, setUserMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  const handleSendMessage = (e: FormEvent) => {
+      console.log(userMessage);
+    e.preventDefault()
+    if (!userMessage) return;
+
+    const newMessage: Message = {text: userMessage, sender: 'user'}
+    setMessages([...messages, newMessage])
+  }
 
   return (
     <>
@@ -20,6 +36,7 @@ export default function Chatbot() {
       {/* CHAT  */}
       {!showChat && (
         <div className="fixed right-24 bottom-[calc(4rem+1.5rem)] hover:cursor-pointer border p-5 shadow-md shadow-white h-[474px]">
+
           <div className="flex flex-col h-full">
             {/* CHAT HEADER */}
             <div>
@@ -34,8 +51,11 @@ export default function Chatbot() {
             </div>
 
             {/* INPUT FORM  */}
-            <ChatInput />
+            <ChatInput userMessage={userMessage} setUserMessage={setUserMessage}
+            handleSendMessage={handleSendMessage}
+            />
           </div>
+
         </div>
       )}
     </>
