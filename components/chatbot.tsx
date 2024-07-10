@@ -4,7 +4,7 @@ import ChatInput from "@/ui/chat-input";
 import UserMessage from "@/ui/user-message";
 import { FormEvent, useState } from "react";
 import { TbMessageChatbot } from "react-icons/tb";
-
+import {chatCompletion} from '@/actions'
 type Message = {
     text: string;
     sender: string
@@ -15,13 +15,16 @@ export default function Chatbot() {
   const [userMessage, setUserMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const handleSendMessage = (e: FormEvent) => {
+  const handleSendMessage = async (e: FormEvent) => {
       console.log(userMessage);
     e.preventDefault()
     if (!userMessage) return;
 
     const newMessage: Message = {text: userMessage, sender: 'user'}
-    setMessages([...messages, newMessage])
+    setMessages([...messages, newMessage]);
+    // show loading
+    const res = await chatCompletion(messages);
+    console.log(res.choices[0].message.content);
   }
 
   return (
