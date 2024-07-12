@@ -4,7 +4,7 @@ import { ChangeEvent, FormEvent } from "react";
 type ChatProps = {
   userMessage: string;
   setUserMessage: (value: string) => void;
-  handleSendMessage: () => void;
+  handleSendMessage: (e: FormEvent) => void;
 };
 
 export default function ChatInput({ userMessage, setUserMessage, handleSendMessage }: ChatProps) {
