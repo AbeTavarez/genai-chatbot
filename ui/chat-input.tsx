@@ -19,10 +19,10 @@ export default function ChatInput({ userMessage, setUserMessage, handleSendMessa
             }
             type="text"
             placeholder="Type your message"
-            className="flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2"
+            className="flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2 "
           />
 
-          <button className="p-2  bg-white text-black inline-flex items-center justify-center rounded-md text-sm font-medium  disabled:pointer-events-none disabled:opacity-50  hover:bg-[#111827E6] h-10 px-4 py-2">
+          <button className="p-2 bg-white text-black inline-flex items-center justify-center rounded-md text-sm font-medium  disabled:pointer-events-none disabled:opacity-50  hover:bg-[#111827E6] h-10 px-4 py-2">
             Send
           </button>
         </form>
