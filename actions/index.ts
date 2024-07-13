@@ -7,22 +7,16 @@ const openAI = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function chatCompletion(messages: Message[]) {
-    console.log(messages);
-    
-    const newMessages = messages.slice(1);
-    console.log(newMessages);
+export async function chatCompletion(chatMessages: Message[]) {
   const chat = [
     { role: "system", content: "You're a helpful assistance" },
-    ...newMessages,
+    ...chatMessages,
   ];
 
-  console.log(chat);
-
-//   const completion = await openAI.chat.completions.create({
-//     messages: chat,
-//     model: "gpt-3.5-turbo",
-//   });
-//   console.log(completion.choices[0]);
-//   return completion; // or return jys the result?
+  const completion = await openAI.chat.completions.create({
+    messages: chat,
+    model: "gpt-3.5-turbo",
+  });
+  console.log(completion.choices[0]);
+  return completion; // or return jys the result?
 }
