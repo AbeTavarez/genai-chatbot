@@ -17,6 +17,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "Hello, how can i help you today?" },
   ]);
+  const [loading, setLoading] = useState(false);
 
   /**
    * Send User messages
@@ -24,18 +25,36 @@ export default function Chatbot() {
    * @returns
    */
   const handleSendMessage = async (e: FormEvent) => {
-    console.log(userMessage);
     e.preventDefault();
+
+    // Log the user message
+    console.log("User Message:", userMessage);
+
     if (!userMessage) return;
 
+    // Create the new message object
     const newMessage: Message = { content: userMessage, role: "user" };
-    setMessages([...messages, newMessage]);
-    // show loading
-    console.log("HERE", messages);
-    
-    const res = await chatCompletion(messages);
-    console.log(res);
-    // console.log(res.choices[0].message.content);
+    console.log("New Message:", newMessage);
+
+    // Update the messages state
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setLoading(true);
+
+    try {
+        // Call the API function with the updated messages
+        const res = await chatCompletion([...messages, newMessage]);
+        console.log("API Response:", res);
+
+        // Handle the API response (example assuming the response structure)
+        if (res?.choices[0]?.message) {
+            const botMessage: Message = { content: res.choices[0].message.content, role: "bot" };
+            setMessages([...messages, botMessage]);
+        }
+    } catch (error) {
+        console.error("API Error:", error);
+    } finally {
+        setLoading(false);
+    }
   };
 
   return (
@@ -60,11 +79,11 @@ export default function Chatbot() {
             {/* CHAT CONTAINER  */}
             <div className="flex flex-col flex-1 items-center justify-center p-2 mt-5  overflow-y-auto">
               {messages &&
-                messages.map((m) => {
+                messages.map((m, i) => {
                   return m.role === "assistant" ? (
-                    <AIMessage {...m} />
+                    <AIMessage {...m} key={i} />
                   ) : (
-                    <UserMessage {...m} />
+                    <UserMessage {...m} key={i} />
                   );
                 })}
             </div>
