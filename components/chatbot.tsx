@@ -1,24 +1,24 @@
 "use client";
 import AIMessage from "@/ui/ai-message";
-import ChatInput from "@/ui/chat-input";
 import UserMessage from "@/ui/user-message";
-import { FormEvent, useState } from "react";
+import ChatInput from "@/ui/chat-input";
 import { TbMessageChatbot } from "react-icons/tb";
+//============
+import { FormEvent, useState } from "react";
 import { chatCompletion } from "@/actions";
 
 // Message Type
 export type Message = {
   content: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
 };
-
 
 export default function Chatbot() {
   const [showChat, setShowChat] = useState(false);
   const [userMessage, setUserMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hello, how can i help you today?" }
+    { role: "assistant", content: "Hello, how can i help you today?" },
   ]);
 
   /**
@@ -43,23 +43,27 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-        // create messages copy without the first message
-        const chatMessages = messages.slice(1);
-        console.log(chatMessages);
-        
-        // Call the API function with the updated messages
-        const res = await chatCompletion([...chatMessages, newMessage]);
-        console.log("API Response:", res);
+      // create messages copy without the first message
+      const chatMessages = messages.slice(1);
+      console.log(chatMessages);
 
-        // Handle the API response (example assuming the response structure)
-        if (res?.choices[0]?.message) {
-            const assistanceMessage: Message = { content: res.choices[0].message.content as string, role: "assistant" };
-            setMessages([...messages, assistanceMessage]);
-        }
+      // Call the API function with the updated messages
+      const res = await chatCompletion([...chatMessages, newMessage]);
+      console.log("API Response:", res);
+
+      // Handle the API response (example assuming the response structure)
+      if (res?.choices[0]?.message) {
+        const assistanceMessage: Message = {
+          content: res.choices[0].message.content as string,
+          role: "assistant",
+        };
+        setMessages([...messages, assistanceMessage]);
+        setUserMessage('');
+      }
     } catch (error) {
-        console.error("API Error:", error);
+      console.error("API Error:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -73,7 +77,7 @@ export default function Chatbot() {
       />
 
       {/* CHAT  */}
-      {!showChat && (
+      {showChat && (
         <div className="fixed right-24 bottom-[calc(4rem+1.5rem)] hover:cursor-pointer border p-5 shadow-md shadow-white h-[474px] w-[500px]">
           <div className="flex flex-col h-full">
             {/* CHAT HEADER */}
@@ -83,7 +87,7 @@ export default function Chatbot() {
             </div>
 
             {/* CHAT CONTAINER  */}
-            <div className="flex flex-col flex-1 items-center p-2 mt-5  overflow-y-auto">
+            <div className="flex flex-col flex-1 items-center p-2 mt-5 overflow-y-auto">
               {messages &&
                 messages.map((m, i) => {
                   return m.role === "assistant" ? (
