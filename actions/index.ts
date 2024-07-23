@@ -19,7 +19,7 @@ type FAQ = {
 // --> 2. Load json file
 const filePath = path.resolve(process.cwd(), 'data', 'faqs.json');
 const faqs: FAQ[] = JSON.parse(fs.readFileSync(filePath, 'utf-8')).faqs;
-console.log(faqs);
+// console.log(faqs);
 
 
 
@@ -27,14 +27,18 @@ console.log(faqs);
 /**
  * Chat Completion
  * @param chatMessages 
- * @returns new message
+ * @param newMessage
+ * @returns new message from assistant
  */
-export async function chatCompletion(chatMessages: Message[], newMessage: string) {
+export async function chatCompletion(chatMessages: Message[], newMessage: Message) {
   // --> 3. check faqs for answer
-const faqAnswer = faqs.find(faq => newMessage.toLowerCase().includes(faq.question.toLowerCase()));
+const faqAnswer = faqs.find(faq => newMessage.content.toLowerCase().includes(faq.question.toLowerCase()));
 
+// -- 4.
 if (faqAnswer) {
-  //TODO:
+  console.log(faqAnswer);
+  
+  return {role: 'assistant', content: faqAnswer}
 }
 
   // create chat with prompt
@@ -54,3 +58,4 @@ if (faqAnswer) {
   console.log(completion.choices[0]);
   return completion; // or return jys the result?
 }
+
