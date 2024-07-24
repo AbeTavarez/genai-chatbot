@@ -1,7 +1,7 @@
 "use server";
-import { Message } from "@/components/chatbot";
+import { Message } from "@/components/ChatBot/chatbot";
 import OpenAI from "openai";
-//  --> 1. import modules
+//TODO  --> 1. import modules
 import fs from "fs";
 import path from "path";
 
@@ -10,13 +10,13 @@ const openAI = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// --> 2.5 type
+//TODO --> 2.5 type
 type FAQ = {
   question: string;
   answer: string;
 };
 
-// --> 2. Load json file
+//TODO --> 2. Load json file
 const filePath = path.resolve(process.cwd(), "data", "faqs.json");
 const faqs: FAQ[] = JSON.parse(fs.readFileSync(filePath, "utf-8")).faqs;
 // console.log(faqs);
@@ -31,12 +31,13 @@ export async function chatCompletion(
   chatMessages: Message[],
   newMessage: Message,
 ) {
-  // --> 3. check faqs for answer
+  try {
+  // TODO --> 3. check faqs for answer
   const faqAnswer = faqs.find((faq) =>
     newMessage.content.toLowerCase().includes(faq.question.toLowerCase()),
   );
 
-  // -- 4.
+  //TODO ---> 4.
   if (faqAnswer) {
     console.log(faqAnswer);
 
@@ -60,7 +61,27 @@ export async function chatCompletion(
     // stream: true
   });
 
-  // completion result (new message)
+  //TODO ---> 5 add check and wrap in try catch
+  if (!completion) {
+    throw new Error("Invalid response from OpenAI API");
+  }
+
+  //TODO ---> 6. Update return data
+  const assistantMessage = completion.choices[0].message?.content;
+  if (!assistantMessage) {
+    throw new Error("No message content from OpenAI");
+  }
+
+  return {role: 'assistant', content: assistantMessage}
+
+  //! completion result (new message)
   console.log(completion.choices[0]);
   return completion; // or return jys the result?
+
+  } catch(error) {
+    console.log(error);
+    //TODO --> 7.
+    return {role: 'assistant', content: "I'm sorry, something went wrong. Please try again later."} 
+  }
+
 }
