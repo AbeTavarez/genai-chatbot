@@ -27,61 +27,58 @@ const faqs: FAQ[] = JSON.parse(fs.readFileSync(filePath, "utf-8")).faqs;
  * @param newMessage
  * @returns new message from assistant
  */
-export async function chatCompletion(
-  chatMessages: Message[],
-  newMessage: Message,
-) {
+export async function chatCompletion(chatMessages: Message[]) {
   try {
-  // TODO --> 3. check faqs for answer
-  const faqAnswer = faqs.find((faq) =>
-    newMessage.content.toLowerCase().includes(faq.question.toLowerCase()),
-  );
+    // TODO --> 3. check faqs for answer
+    const faqAnswer = faqs.find((faq) =>
+      chatMessages.at(-1)?.content.toLowerCase().includes(faq.question.toLowerCase()),
+    );
 
-  //TODO ---> 4.
-  if (faqAnswer) {
-    console.log(faqAnswer);
+    //TODO ---> 4.
+    if (faqAnswer) {
+      console.log(faqAnswer);
+      return { role: "assistant", content: faqAnswer.answer } as Message;
+    }
 
-    return { role: "assistant", content: faqAnswer.answer };
-  }
+    console.log(`Reaching out to OpenAI....`);
+    
 
-  // create chat with prompt
-  const chat = [
-    { role: "system", content: "You're a helpful assistance" },
-    ...faqs.map((faq) => ({
-      role: "system",
-      content: `Q: ${faq.question}\nA: ${faq.answer}`,
-    })),
-    ...chatMessages,
-  ];
+    // create chat with prompt
+    const chat = [
+      { role: "system", content: "You're a helpful assistance" },
+      ...faqs.map((faq) => ({
+        role: "system",
+        content: `Q: ${faq.question}\nA: ${faq.answer}`,
+      })),
+      ...chatMessages,
+    ];
 
-  // API Request
-  const completion = await openAI.chat.completions.create({
-    messages: chat,
-    model: "gpt-4o-mini",
-    // stream: true
-  });
+    // API Request
+    const completion = await openAI.chat.completions.create({
+      messages: chat,
+      model: "gpt-4o-mini",
+      // stream: true
+    });
 
-  //TODO ---> 5 add check and wrap in try catch
-  if (!completion) {
-    throw new Error("Invalid response from OpenAI API");
-  }
+    //TODO ---> 5 add check and wrap in try catch
+    if (!completion) {
+      throw new Error("Invalid response from OpenAI API");
+    }
 
-  //TODO ---> 6. Update return data
-  const assistantMessage = completion.choices[0].message?.content;
-  if (!assistantMessage) {
-    throw new Error("No message content from OpenAI");
-  }
+    //TODO ---> 6. Update return data
+    const assistantMessage = completion.choices[0].message?.content;
+    if (!assistantMessage) {
+      throw new Error("No message content from OpenAI");
+    }
 
-  return {role: 'assistant', content: assistantMessage}
+    return { role: "assistant", content: assistantMessage } as Message;
 
-  //! completion result (new message)
-  console.log(completion.choices[0]);
-  return completion; // or return jys the result?
-
-  } catch(error) {
+  } catch (error) {
     console.log(error);
     //TODO --> 7.
-    return {role: 'assistant', content: "I'm sorry, something went wrong. Please try again later."} 
+    return {
+      role: "assistant",
+      content: "I'm sorry, something went wrong. Please try again later.",
+    } as Message;
   }
-
 }
