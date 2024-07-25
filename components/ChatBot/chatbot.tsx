@@ -45,21 +45,19 @@ export default function Chatbot() {
     try {
       // create messages copy without the first message
       const chatMessages = messages.slice(1);
-      console.log(chatMessages);
+      console.log('CHAT Messages::: ', chatMessages);
 
       // Call the API function with the updated messages
-      const res = await chatCompletion([...chatMessages, newMessage], newMessage);
+      const res: Message = await chatCompletion([...chatMessages, newMessage]) ;
       console.log("API Response:", res);
+      // setUserMessage("");
+      // setMessages(prevMessages => [...prevMessages, res]);
 
+      // TODO --> 8. 
       // Handle the API response (example assuming the response structure)
-      if (res?.choices[0]?.message) {
-        setUserMessage("");
-        const assistanceMessage: Message = {
-          content: res.choices[0].message.content as string,
-          role: "assistant",
-        };
-        setMessages(prevMessages => [...prevMessages, assistanceMessage]);
-      }
+      setUserMessage("");
+      setMessages((prevMessages) => [...prevMessages, res]);
+      
     } catch (error) {
       console.error("API Error:", error);
     } finally {
