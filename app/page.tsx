@@ -1,5 +1,4 @@
-import Chatbot from "@/components/chatbot";
-import Image from "next/image";
+import Chatbot from "@/components/ChatBot/chatbot";
 
 export default function Home() {
   return (

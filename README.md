@@ -1,3 +1,15 @@
+# Notes
+
+## Create the Chat UI
+0 - Clean home page, add css classes
+1 - create chatbot -> make it a client component and ui components
+    - install react icons
+    - showChat state
+2 -
+
+3 - setup openai / create chatCompletion function
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

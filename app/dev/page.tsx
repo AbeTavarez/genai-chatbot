@@ -1,7 +1,7 @@
 "use client";
-import AIMessage from "@/ui/ai-message";
-import UserMessage from "@/ui/user-message";
-import ChatInput from "@/ui/chat-input";
+import AIMessage from "@/components/ChatBot/ui/ai-message";
+import UserMessage from "@/components/ChatBot/ui/user-message";
+import ChatInput from "@/components/ChatBot/ui/chat-input";
 import { TbMessageChatbot } from "react-icons/tb";
 //============
 import { FormEvent, useState } from "react";
@@ -48,7 +48,8 @@ export default function Dev() {
       console.log(chatMessages);
 
       // Call the API function with the updated messages
-      const res = await chatCompletion([...chatMessages, newMessage]);
+    //   const res = await chatCompletion([...chatMessages, newMessage]);
+      const res = await fetch('/chat/api/');
       console.log("API Response:", res);
 
       // Handle the API response (example assuming the response structure)
