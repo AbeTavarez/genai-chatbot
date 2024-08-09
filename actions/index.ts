@@ -55,7 +55,7 @@ export async function chatCompletion(chatMessages: Message[]) {
 
     // API Request
     const completion = await openAI.chat.completions.create({
-      messages: chat,
+      messages: chat as OpenAI.ChatCompletionMessageParam[],
       model: "gpt-4o-mini",
       // stream: true
     });
