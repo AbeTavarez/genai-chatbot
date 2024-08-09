@@ -11,6 +11,7 @@ import { chatCompletion } from "@/actions";
 export type Message = {
   content: string;
   role: "user" | "assistant" | "system";
+  name?: string;
 };
 
 export default function Chatbot() {
