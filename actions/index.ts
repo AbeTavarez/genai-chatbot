@@ -18,6 +18,8 @@ type FAQ = {
 };
 
 //TODO --> 2. Load json file
+console.log('LOCATION:::', fileURLToPath(import.meta.url));
+
 const rootDir = process.env.NODE_ENV === 'production' ? process.env.PWD : process.cwd();
 console.log('ROOT_DIR_NAME', rootDir);
 
