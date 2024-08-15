@@ -3,7 +3,8 @@ import { Message } from "@/components/ChatBot/chatbot";
 import OpenAI from "openai";
 //TODO  --> 1. import modules
 import fs from "fs";
-import path from "path";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 
 // === OPEN AI
 const openAI = new OpenAI({
@@ -17,7 +18,12 @@ type FAQ = {
 };
 
 //TODO --> 2. Load json file
-const filePath = path.resolve(process.cwd(), "data", "faqs.json");
+const rootDir = process.env.NODE_ENV === 'production' ? process.env.PWD : process.cwd();
+console.log('ROOT_DIR_NAME', rootDir);
+
+const filePath = path.resolve(rootDir!, "data", "faqs.json");
+console.log('FILE_PATH', filePath);
+
 const faqs: FAQ[] = JSON.parse(fs.readFileSync(filePath, "utf-8")).faqs;
 // console.log(faqs);
 
