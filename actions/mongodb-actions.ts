@@ -1,15 +1,15 @@
 "use server";
 import mongoDBClient from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { FAQDocument } from ".";
+import { FAQ, FAQDocument } from ".";
 const db = mongoDBClient.db(process.env.MONGODB_DBNAME);
 
-export async function fetchFAQS(): Promise<FAQDocument[] | null> {
+export async function fetchFAQS(): Promise<FAQDocument | null> {
   try {
     const collectionName = process.env.MONGODB_COLLECTIONNAME as string;
     const documentId = process.env.MONGODB_DOCUMENTID as string;
 
-    const faqs = await db.collection<FAQDocument[]>(collectionName).findOne({
+    const faqs = await db.collection<FAQDocument>(collectionName).findOne({
       _id: ObjectId.createFromHexString(documentId),
     });
 
