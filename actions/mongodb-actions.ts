@@ -1,6 +1,6 @@
 "use server";
 import mongoDBClient from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 
 const db = mongoDBClient.db(process.env.MONGODB_DBNAME);
 
@@ -19,7 +19,7 @@ export async function fetchFAQS() {
     if (!faqs) {
       throw new Error("Error fetching data from db");
     }
-    return faqs;
+    return faqs as WithId<Document>;
   } catch (error) {
     console.error(error);
     return null;
