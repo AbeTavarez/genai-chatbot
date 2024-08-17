@@ -2,9 +2,8 @@
 import { Message } from "@/components/ChatBot/chatbot";
 import OpenAI from "openai";
 //TODO  --> 1. import modules
-import fs from "fs";
-import path, { dirname } from "path";
-import { fileURLToPath } from "url";
+import { fetchFAQS } from "./mongodb-actions";
+import { ObjectId } from "mongodb";
 
 // === OPEN AI
 const openAI = new OpenAI({
@@ -12,22 +11,15 @@ const openAI = new OpenAI({
 });
 
 //TODO --> 2.5 type
-type FAQ = {
+interface FAQ {
   question: string;
   answer: string;
 };
 
-//TODO --> 2. Load json file
-console.log('LOCATION:::', fileURLToPath(import.meta.url));
-
-const rootDir = process.env.NODE_ENV === 'production' ? process.env.PWD : process.cwd();
-console.log('ROOT_DIR_NAME', rootDir);
-
-const filePath = path.resolve(rootDir!, "data", "faqs.json");
-console.log('FILE_PATH', filePath);
-
-const faqs: FAQ[] = JSON.parse(fs.readFileSync(filePath, "utf-8")).faqs;
-// console.log(faqs);
+interface FAQDocument extends FAQ  {
+  _id: ObjectId,
+  faqs: [FAQ],
+}
 
 /**
  * Chat Completion
@@ -37,9 +29,19 @@ const faqs: FAQ[] = JSON.parse(fs.readFileSync(filePath, "utf-8")).faqs;
  */
 export async function chatCompletion(chatMessages: Message[]) {
   try {
+    let doc: FAQDocument | null = await fetchFAQS();
+    console.log(doc);
+
+    if (!doc) {
+      throw new Error("");
+    }
+
     // TODO --> 3. check faqs for answer
-    const faqAnswer = faqs.find((faq) =>
-      chatMessages.at(-1)?.content.toLowerCase().includes(faq.question.toLowerCase()),
+    const faqAnswer = doc.faqs?.find((faq) =>
+      chatMessages
+        .at(-1)
+        ?.content.toLowerCase()
+        .includes(faq.question.toLowerCase()),
     );
 
     //TODO ---> 4.
@@ -49,12 +51,11 @@ export async function chatCompletion(chatMessages: Message[]) {
     }
 
     console.log(`Reaching out to OpenAI....`);
-    
 
     // create chat with prompt
     const chat = [
       { role: "system", content: "You're a helpful assistance" },
-      ...faqs.map((faq) => ({
+      ...doc.faqs.map((faq) => ({
         role: "system",
         content: `Q: ${faq.question}\nA: ${faq.answer}`,
       })),
@@ -80,7 +81,6 @@ export async function chatCompletion(chatMessages: Message[]) {
     }
 
     return { role: "assistant", content: assistantMessage } as Message;
-
   } catch (error) {
     console.log(error);
     //TODO --> 7.
