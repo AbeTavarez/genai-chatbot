@@ -3,7 +3,7 @@ import { Message } from "@/components/ChatBot/chatbot";
 import OpenAI from "openai";
 //TODO  --> 1. import modules
 import { fetchFAQS } from "./mongodb-actions";
-import { ObjectId, WidthId } from "mongodb";
+import { ObjectId } from "mongodb";
 
 // === OPEN AI
 const openAI = new OpenAI({
@@ -11,14 +11,14 @@ const openAI = new OpenAI({
 });
 
 //TODO --> 2.5 type
-interface FAQ {
+export interface FAQ {
   question: string;
   answer: string;
 };
 
-interface FAQDocument extends FAQ {
+export interface FAQDocument extends FAQ {
   _id: ObjectId,
-  faqs: [FAQ],
+  faqs: FAQ[],
 }
 
 /**
@@ -29,14 +29,11 @@ interface FAQDocument extends FAQ {
  */
 export async function chatCompletion(chatMessages: Message[]) {
   try {
-    let faqsDoc;
     const document: FAQDocument | null = await fetchFAQS();
     console.log(document);
 
-    if (document) {
-      faqsDoc = document as WidthId<Document>;
-    } else {
-      throw new Error('')
+    if (!document) {
+      throw new Error('Error fetching FAQs')
     }
 
     // TODO --> 3. check faqs for answer
@@ -58,7 +55,7 @@ export async function chatCompletion(chatMessages: Message[]) {
     // create chat with prompt
     const chat = [
       { role: "system", content: "You're a helpful assistance" },
-      ...doc.faqs.map((faq) => ({
+      ...document.faqs.map((faq) => ({
         role: "system",
         content: `Q: ${faq.question}\nA: ${faq.answer}`,
       })),
