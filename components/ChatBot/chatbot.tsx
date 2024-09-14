@@ -1,10 +1,11 @@
 "use client";
+import { clsx } from "clsx";
 import AIMessage from "@/components/ChatBot/ui/ai-message";
 import UserMessage from "@/components/ChatBot/ui/user-message";
 import ChatInput from "@/components/ChatBot/ui/chat-input";
 import { TbMessageChatbot } from "react-icons/tb";
 //============
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useRef, useEffect } from "react";
 import { chatCompletion } from "@/actions";
 
 // Message Type
@@ -15,6 +16,7 @@ export type Message = {
 };
 
 export default function Chatbot() {
+  const chatContainerRef = useRef<HTMLDivElement | null>(null); // 1.
   const [showChat, setShowChat] = useState(false);
   const [userMessage, setUserMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,43 +24,52 @@ export default function Chatbot() {
     { role: "assistant", content: "Hello, how can i help you today?" },
   ]);
 
+  // Scroll to the bottom when messages changes
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages, loading]);
+
   /**
    * Send User messages
    * @param e
    * @returns
    */
   const handleSendMessage = async (e: FormEvent) => {
-    e.preventDefault();
-
-    // Log the user message
-    console.log("User Message:", userMessage);
-
-    if (!userMessage) return;
-
-    // Create the new message object
-    const newMessage: Message = { content: userMessage, role: "user" };
-    console.log("New Message:", newMessage);
-
-    // Update the messages state
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    setLoading(true);
-
     try {
+      e.preventDefault();
+
+      // Log the user message
+      console.log("User Message:", userMessage);
+
+      if (!userMessage) return;
+
+      // Create the new message object
+      const newMessage: Message = { content: userMessage, role: "user" };
+      console.log("New Message:", newMessage);
+
+      // Update the messages state
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      
+      // Clear input and set loading
+      setUserMessage("");
+      setLoading(true);
+
       // create messages copy without the first message
       const chatMessages = messages.slice(1);
-      console.log('CHAT Messages::: ', chatMessages);
+      console.log("CHAT Messages::: ", chatMessages);
 
       // Call the API function with the updated messages
-      const res: Message = await chatCompletion([...chatMessages, newMessage]) ;
+      const res: Message = await chatCompletion([...chatMessages, newMessage]);
       console.log("API Response:", res);
-      // setUserMessage("");
-      // setMessages(prevMessages => [...prevMessages, res]);
 
-      // TODO --> 8. 
+      // TODO --> 8.
       // Handle the API response (example assuming the response structure)
-      setUserMessage("");
       setMessages((prevMessages) => [...prevMessages, res]);
-      
     } catch (error) {
       console.error("API Error:", error);
     } finally {
@@ -72,12 +83,17 @@ export default function Chatbot() {
       <TbMessageChatbot
         size={64}
         onClick={() => setShowChat(!showChat)}
-        className="fixed right-24 bottom-[calc(1rem)] hover:cursor-pointer"
+        className={clsx(
+          "fixed right-12 bottom-[calc(1rem)] hover:cursor-pointer hover:text-blue-400",
+          {
+            'animate-bounce': !showChat
+          },
+        )}
       />
 
       {/* CHAT  */}
       {showChat && (
-        <div className="fixed right-24 bottom-[calc(4rem+1.5rem)] hover:cursor-pointer border p-5 shadow-md shadow-white h-[474px] w-[500px]">
+        <div className="fixed right-24 bottom-[calc(4rem+1.5rem)] hover:cursor-pointer border p-5 shadow-md shadow-white h-[474px] w-[500px] bg-[#1e1e1e] rounded-md">
           <div className="flex flex-col h-full">
             {/* CHAT HEADER */}
             <div>
@@ -86,7 +102,10 @@ export default function Chatbot() {
             </div>
 
             {/* CHAT CONTAINER  */}
-            <div className="flex flex-col flex-1 items-center p-2 mt-5 overflow-y-auto">
+            <div
+              className="flex flex-col flex-1 items-center p-2 mt-5 overflow-y-auto"
+              ref={chatContainerRef}
+            >
               {messages &&
                 messages.map((m, i) => {
                   return m.role === "assistant" ? (
@@ -95,6 +114,12 @@ export default function Chatbot() {
                     <UserMessage {...m} key={i} />
                   );
                 })}
+
+              {loading && (
+                <div className="text-center text-gray-500 mt-2">
+                  Waiting for a response...
+                </div>
+              )}
             </div>
 
             {/* INPUT FORM  */}
